@@ -2,17 +2,45 @@
   "name": "remark-card",
   "description": "A remark plugin to parse card component(s)",
   "type": "module",
-  "module": "index.ts",
+  "exports": "./dist/index.js",
   "author": "brklntmhwk",
   "license": "MIT",
   "keywords": [
-    "remark"
+    "remark",
+    "remark-plugin",
+    "card",
+    "cardgrid",
+    "markdown",
+    "html"
   ],
+  "scripts": {
+    "format": "bunx biome format ./src",
+    "format:fix": "bunx biome format --write ./src",
+    "lint": "bunx biome lint ./src",
+    "lint:fix": "bunx biome lint --write ./src",
+    "check": "bunx biome check ./src",
+    "check:fix": "bunx biome check --write ./src",
+    "test-type": "type-coverage"
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "detail": true,
+    "strict": true,
+    "ignoreCatch": true
+  },
   "dependencies": {
+    "unified": "^11.0.5",
+    "unist-util-is": "^6.0.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/bun": "latest",
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
+    "mdast-util-directive": "^3.0.0",
+    "remark-parse": "^11.0.0",
+    "type-coverage": "^2.29.7",
     "typescript": "^5.6.3"
   }
 }

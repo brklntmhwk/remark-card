@@ -1,3 +1,1 @@
-import { visit } from "unist-util-visit";
-
-console.log("Hello via Bun!");
+export { default } from "./src/index.ts";
