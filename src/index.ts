@@ -1,159 +1,154 @@
 /// <reference types="mdast-util-directive" />
 
 import type { PhrasingContent, Root } from "mdast";
+import type { LeafDirective } from "mdast-util-directive";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 import {
-  isLink,
-  isList,
-  isParagraph,
-  isParent,
-  isImage,
-  isText,
-  isContainerDirective,
+	isContainerDirective,
+	isImage,
+	isLink,
+	isParagraph,
+	isText,
 } from "./utils";
-import type { LeafDirective } from "mdast-util-directive";
 
-type BorderStyleMap = {
-  className: string;
-  markdownSymbol: string;
-};
-
-interface Options {
-  borderStyleList?: BorderStyleMap[];
+export interface Options {
+	borderStyleList?: string[];
 }
 
-const defaultBorderStyleList: Readonly<BorderStyleMap[]> = [
-  {
-    className: "solid",
-    markdownSymbol: "-",
-  },
-  {
-    className: "double",
-    markdownSymbol: "=",
-  },
-  {
-    className: "dotted",
-    markdownSymbol: ".",
-  },
-  {
-    className: "dashed",
-    markdownSymbol: "~",
-  },
-];
+// const defaultBorderStyleList: Readonly<string[]> = [
+//   "solid",
+//   "double",
+//   "dotted",
+//   "dashed",
+// ];
 
-const parseSign = (
-  sign: string | undefined,
-  borderStyles: Readonly<BorderStyleMap[]>
-): string | undefined => {
-  if (sign === undefined || sign === "") return;
-
-  const defaultSymbol = borderStyles[0]?.markdownSymbol;
-  if (defaultSymbol === undefined) return;
-
-  const symbols = borderStyles.map((style) => style.markdownSymbol);
-  const reg = new RegExp(`@(?<borderType>[${symbols.join()}])?$`);
-  const matched = sign.match(reg);
-
-  const borderTypeSign = matched?.groups?.borderType;
-  let borderType: string = defaultSymbol;
-
-  for (const style of borderStyles) {
-    if (borderTypeSign === style.markdownSymbol) {
-      borderType = style.className;
-    }
-  }
-
-  return borderType;
-};
-
-// In terms of separation of concerns, what this plugin is in charge of is just to parse Markdown content into decent HTML tags. CSS things have nothing to do with it.
-// Perhaps it's no concern of it to check whether content comes as a list or not either.
-// :::card
-// ![alt](imgUrl) or [![alt](imgUrl)](linkUrl)
-// card content here.
-// :::
+// const findClassName = (c: string, refList: Readonly<string[]>) =>
+//   c.split(/\s+/).find((c) => c in refList);
 
 const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
-  const { borderStyleList = defaultBorderStyleList } = options;
+	const {/* borderStyleList = defaultBorderStyleList */} = options;
 
-  return (tree) => {
-    visit(tree, isContainerDirective, (node) => {
-      if (!(node.name === "card")) return;
-      if (node.children.length === 0) return;
+	return (tree) => {
+		visit(tree, isContainerDirective, (node) => {
+			if (!(node.name === "card-grid")) return;
+			if (node.children.length === 0) return;
 
-      const [firstNode, secondNode, ...restNodes] = node.children;
-      if (!isParagraph(firstNode)) return;
-      if (firstNode.children.length === 0) return;
+			node.data = {
+				...node.data,
+				hProperties: {
+					class: node.attributes?.class,
+				},
+			};
 
-      let cardImageOrLink: PhrasingContent;
+			// if (node.attributes && node.attributes.class) {
+			//   const borderStyleClass = findClassName(
+			//     node.attributes.class,
+			//     borderStyleList
+			//   );
+			//   if (!borderStyleClass) return;
 
-      if (firstNode.data?.directiveLabel === true) {
-        if (!isText(firstNode.children[0])) return;
+			//   node.children.forEach((card) => {
+			//     if (!isContainerDirective(card) || card.name !== "card") return;
 
-        const cardLabel = firstNode.children[0].value;
+			//     if (card.attributes && card.attributes.class) {
+			//       if (findClassName(card.attributes.class, borderStyleList)) return;
 
-        if (!isParagraph(secondNode)) return;
-        cardImageOrLink = secondNode.children[0];
+			//       card.data = {
+			//         ...card.data,
+			//         hProperties: {
+			//           class: borderStyleClass,
+			//         },
+			//       };
+			//     }
+			//   });
 
-        if (isImage(cardImageOrLink)) {
-          cardImageOrLink.alt = cardImageOrLink.alt ?? cardLabel;
-        } else if (isLink(cardImageOrLink)) {
-          const cardImage = cardImageOrLink.children[0];
-          if (!isImage(cardImage)) return;
+			//   node.data = {
+			//     ...node.data,
+			//     hProperties: {
+			//       class: node.attributes.class,
+			//     },
+			//   };
+			// }
+		});
 
-          cardImage.alt = cardImage.alt ?? cardLabel;
-        } else {
-          return;
-        }
-      } else {
-        cardImageOrLink = firstNode.children[0];
-      }
+		visit(tree, "containerDirective", (node) => {
+			if (node.name !== "card") return;
+			if (node.children.length === 0) return;
 
-      const imageWrapper: LeafDirective = {
-        type: "leafDirective",
-        name: "image-wrapper",
-        data: {
-          hName: "div",
-        },
-        children: [cardImageOrLink],
-      };
+			const [firstNode, secondNode, ..._restNodes] = node.children;
+			if (!isParagraph(firstNode)) return;
+			if (firstNode.children.length === 0) return;
 
-      const content: LeafDirective = {
-        type: "leafDirective",
-        name: "card-content",
-        data: {
-          hName: "div",
-        },
-        children: [],
-      };
+			let cardImageOrLink: PhrasingContent;
+			let cardContent: PhrasingContent[];
+			let cardLabel: string | undefined = undefined;
 
-      restNodes.forEach((contentNode, index, thisArr) => {
-        if (!isParagraph(contentNode)) return;
-        if (contentNode.children.length === 0) return;
+			const imageWrapper: LeafDirective = {
+				type: "leafDirective",
+				name: "image-wrapper",
+				data: {
+					hName: "div",
+					hProperties: {
+						class: "image-wrapper",
+					},
+				},
+				children: [],
+			};
 
-        const cardContent = contentNode.children[0];
-        if (isText(cardContent)) {
-          content.children.push(cardContent);
-        } else {
-          if (!isParent(cardContent)) return;
-          if (cardContent.children.length === 0) return;
-          if (!isText(cardContent.children[0])) return;
+			const content: LeafDirective = {
+				type: "leafDirective",
+				name: "card-content",
+				data: {
+					hName: "div",
+					hProperties: {
+						class: "card-content",
+					},
+				},
+				children: [],
+			};
 
-          content.children.push(cardContent);
-        }
+			if (firstNode.data?.directiveLabel === true) {
+				if (!isText(firstNode.children[0])) return;
 
-        if (thisArr.length !== index) {
-          contentNode.children.push({
-            type: "text",
-            value: "\n",
-          });
-        }
-      });
+				cardLabel = firstNode.children[0].value;
 
-      node.children.splice(0, Infinity, imageWrapper, content);
-    });
-  };
+				if (!isParagraph(secondNode)) return;
+				const [imageOrLink, ...restContent] = secondNode.children;
+				cardImageOrLink = imageOrLink;
+				cardContent = restContent;
+			} else {
+				const [imageOrLink, ...restContent] = firstNode.children;
+				cardImageOrLink = imageOrLink;
+				cardContent = restContent;
+			}
+
+			if (isImage(cardImageOrLink)) {
+				cardImageOrLink.alt = cardImageOrLink.alt || cardLabel || "";
+			} else if (isLink(cardImageOrLink)) {
+				const cardImage = cardImageOrLink.children[0];
+				if (!isImage(cardImage)) return;
+
+				cardImage.alt = cardImage.alt ?? cardLabel;
+			} else {
+				return;
+			}
+
+			imageWrapper.children.push(cardImageOrLink);
+
+			for (const contentElem of cardContent) {
+				content.children.push(contentElem);
+			}
+
+			node.data = {
+				...node.data,
+				hProperties: {
+					class: node.attributes?.class,
+				},
+			};
+			node.children.splice(0, Number.POSITIVE_INFINITY, imageWrapper, content);
+		});
+	};
 };
 
 export default remarkCard;

@@ -1,15 +1,61 @@
 # remark-card
 
-To install dependencies:
+A remark plugin to parse card layout component(s).
 
-```bash
-bun install
+## Features
+
+- Compatible with the proposed generic syntax for custom directives/plugins in Markdown
+- Fully customizable styles
+- Written in TypeScript
+
+## How to Use
+
+### Syntax
+
+For example, the following Markdown content:
+
+```markdown
+:::card{.card.solid}
+![image alt](https://xxxxx.com/sample.jpg)
+Card content
+:::
 ```
 
-To run:
+Yields:
 
-```bash
-bun run index.ts
+```html
+<div class="card solid">
+  <div><img src="https://xxxxx.com/sample.jpg" alt="image alt" /></div>
+  <div>Card content</div>
+</div>
 ```
 
-This project was created using `bun init` in bun v1.1.16. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+### Installation
+
+To install the plugin:
+
+With `npm`:
+
+```bash
+npm install remark-card --save-dev
+```
+
+With `yarn`:
+
+```bash
+yarn add --dev remark-card
+```
+
+With `pnpm`:
+
+```bash
+pnpm add -D remark-card
+```
+
+With `bun`:
+
+```bash
+bun install -D remark-card
+```
+
+###
