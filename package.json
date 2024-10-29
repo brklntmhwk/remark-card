@@ -24,11 +24,11 @@
   ],
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
-    "format": "bunx biome format ./src",
+    "format": "bunx biome format ./src ./test",
     "format:fix": "bunx biome format --write ./src ./test",
-    "lint": "bunx biome lint ./src",
+    "lint": "bunx biome lint ./src ./test",
     "lint:fix": "bunx biome lint --write ./src ./test",
-    "check": "bunx biome check ./src",
+    "check": "bunx biome check ./src ./test",
     "check:fix": "bunx biome check --write ./src ./test",
     "test-type": "type-coverage"
   },

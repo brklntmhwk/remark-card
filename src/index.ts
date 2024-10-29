@@ -15,7 +15,7 @@ import {
 const remarkCard: Plugin<[], Root> = () => {
 	return (tree) => {
 		visit(tree, isContainerDirective, (node) => {
-			if (!(node.name === "card-grid")) return;
+			if (node.name !== "card-grid") return;
 			if (node.children.length === 0) return;
 
 			node.data = {

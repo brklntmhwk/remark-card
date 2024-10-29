@@ -1,31 +1,20 @@
-name: CI
+name: Package release
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release type (one of): major, minor, patch"
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Install Dependencies
-        run: bun install --no-save
-      - name: Format & Lint Code
-        run: bun --bun run check
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,9 +26,9 @@ jobs:
         run: bun install --no-save
       - name: Build
         run: bun --bun run build
-  test:
+  release:
+    needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,5 +38,12 @@ jobs:
           bun-version: latest
       - name: Install Dependencies
         run: bun install --no-save
-      - name: Test Code
-        run: bun test
+      - name: Set up Node.js env
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Publish
+        run: npm publish --access public --tag ${{ env.RELEASE_TAG }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
