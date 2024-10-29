@@ -182,6 +182,10 @@ Some key takeaways are:
   - It seems technically feasible but the use case of this might be rare
 - Customizable class names for image & content wrapper tags
 
+## TODO(s)
+
+- [ ] add a demo screenshot of the actual `card-grid` & `card` combination to this page
+
 ## License
 
 This project is licensed under the MIT License, see the LICENSE file for more details.
