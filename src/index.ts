@@ -12,23 +12,7 @@ import {
 	isText,
 } from "./utils";
 
-export interface Options {
-	borderStyleList?: string[];
-}
-
-// const defaultBorderStyleList: Readonly<string[]> = [
-//   "solid",
-//   "double",
-//   "dotted",
-//   "dashed",
-// ];
-
-// const findClassName = (c: string, refList: Readonly<string[]>) =>
-//   c.split(/\s+/).find((c) => c in refList);
-
-const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
-	const {/* borderStyleList = defaultBorderStyleList */} = options;
-
+const remarkCard: Plugin<[], Root> = () => {
 	return (tree) => {
 		visit(tree, isContainerDirective, (node) => {
 			if (!(node.name === "card-grid")) return;
@@ -40,39 +24,9 @@ const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
 					class: node.attributes?.class,
 				},
 			};
-
-			// if (node.attributes && node.attributes.class) {
-			//   const borderStyleClass = findClassName(
-			//     node.attributes.class,
-			//     borderStyleList
-			//   );
-			//   if (!borderStyleClass) return;
-
-			//   node.children.forEach((card) => {
-			//     if (!isContainerDirective(card) || card.name !== "card") return;
-
-			//     if (card.attributes && card.attributes.class) {
-			//       if (findClassName(card.attributes.class, borderStyleList)) return;
-
-			//       card.data = {
-			//         ...card.data,
-			//         hProperties: {
-			//           class: borderStyleClass,
-			//         },
-			//       };
-			//     }
-			//   });
-
-			//   node.data = {
-			//     ...node.data,
-			//     hProperties: {
-			//       class: node.attributes.class,
-			//     },
-			//   };
-			// }
 		});
 
-		visit(tree, "containerDirective", (node) => {
+		visit(tree, isContainerDirective, (node) => {
 			if (node.name !== "card") return;
 			if (node.children.length === 0) return;
 
@@ -82,16 +36,13 @@ const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
 
 			let cardImageOrLink: PhrasingContent;
 			let cardContent: PhrasingContent[];
-			let cardLabel: string | undefined = undefined;
+			let cardLabel = "";
 
 			const imageWrapper: LeafDirective = {
 				type: "leafDirective",
 				name: "image-wrapper",
 				data: {
 					hName: "div",
-					hProperties: {
-						class: "image-wrapper",
-					},
 				},
 				children: [],
 			};
@@ -101,9 +52,6 @@ const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
 				name: "card-content",
 				data: {
 					hName: "div",
-					hProperties: {
-						class: "card-content",
-					},
 				},
 				children: [],
 			};
@@ -124,7 +72,7 @@ const remarkCard: Plugin<[Options?], Root> = (options = {}) => {
 			}
 
 			if (isImage(cardImageOrLink)) {
-				cardImageOrLink.alt = cardImageOrLink.alt || cardLabel || "";
+				cardImageOrLink.alt = cardImageOrLink.alt || cardLabel;
 			} else if (isLink(cardImageOrLink)) {
 				const cardImage = cardImageOrLink.children[0];
 				if (!isImage(cardImage)) return;

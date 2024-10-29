@@ -5,6 +5,15 @@
   "exports": "./dist/index.js",
   "author": "brklntmhwk",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brklntmhwk/remark-card"
+  },
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "remark",
     "remark-plugin",
@@ -14,12 +23,13 @@
     "html"
   ],
   "scripts": {
+    "build": "tsc --project tsconfig.build.json",
     "format": "bunx biome format ./src",
-    "format:fix": "bunx biome format --write ./src",
+    "format:fix": "bunx biome format --write ./src ./test",
     "lint": "bunx biome lint ./src",
-    "lint:fix": "bunx biome lint --write ./src",
+    "lint:fix": "bunx biome lint --write ./src ./test",
     "check": "bunx biome check ./src",
-    "check:fix": "bunx biome check --write ./src",
+    "check:fix": "bunx biome check --write ./src ./test",
     "test-type": "type-coverage"
   },
   "typeCoverage": {
