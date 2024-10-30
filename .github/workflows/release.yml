@@ -58,7 +58,7 @@ jobs:
       - name: Pre-Release Version Upgrade
         if: github.event.inputs.release-type == 'prerelease'
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE) >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
         env:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
@@ -66,7 +66,7 @@ jobs:
       - name: Release Version Upgrade
         if: github.event.inputs.release-type != 'prerelease'
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE) >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       - name: Changelog Update
