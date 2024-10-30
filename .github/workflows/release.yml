@@ -35,7 +35,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - name: Checkout
@@ -122,6 +122,6 @@ jobs:
         with:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ steps.get-changelog.outputs.changelog }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+          prerelease: ${{ github.event.inputs.release-type == 'prerelease' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
