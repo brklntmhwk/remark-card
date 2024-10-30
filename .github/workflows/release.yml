@@ -60,7 +60,7 @@ jobs:
         run: |
           {
             echo 'NEW_VERSION<<EOF'
-            npm --no-git-tag-version --preid=beta version $RELEASE_TYPE
+            npm --no-git-tag-version --preid=beta version ${{ env.RELEASE_TYPE }}
             echo EOF
           } >> "$GITHUB_ENV"
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
@@ -72,10 +72,12 @@ jobs:
         run: |
           {
             echo 'NEW_VERSION<<EOF'
-            npm --no-git-tag-version version $RELEASE_TYPE
+            npm --no-git-tag-version version ${{ env.RELEASE_TYPE }}
             echo EOF
           } >> "$GITHUB_ENV"
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+        env:
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
       - name: Changelog Update
         uses: superfaceai/release-changelog-action@v3
