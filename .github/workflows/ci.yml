@@ -15,39 +15,50 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
       - name: Install Dependencies
         run: bun install --no-save
+
       - name: Format & Lint Code
         run: bun --bun run check
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
       - name: Install Dependencies
         run: bun install --no-save
+
       - name: Build
         run: bun --bun run build
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
       - name: Install Dependencies
         run: bun install --no-save
+
       - name: Test Code
         run: bun test
