@@ -5,98 +5,112 @@ import type { LeafDirective } from "mdast-util-directive";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 import {
-	isContainerDirective,
-	isImage,
-	isLink,
-	isParagraph,
-	isText,
+  isContainerDirective,
+  isImage,
+  isLink,
+  isParagraph,
+  isText,
 } from "./utils.js";
 
-const remarkCard: Plugin<[], Root> = () => {
-	return (tree) => {
-		visit(tree, isContainerDirective, (node) => {
-			if (node.name !== "card-grid") return;
-			if (node.children.length === 0) return;
+export interface Config {
+  customHTMLTags: {
+    enabled: boolean;
+  };
+}
 
-			node.data = {
-				...node.data,
-				hProperties: {
-					class: node.attributes?.class,
-				},
-			};
-		});
+const defaultConfig: Config = {
+  customHTMLTags: {
+    enabled: false,
+  },
+};
 
-		visit(tree, isContainerDirective, (node) => {
-			if (node.name !== "card") return;
-			if (node.children.length === 0) return;
+const remarkCard: Plugin<[Config?], Root> = (config = defaultConfig) => {
+  return (tree) => {
+    visit(tree, isContainerDirective, (node) => {
+      if (node.name !== "card-grid") return;
+      if (node.children.length === 0) return;
 
-			const [firstNode, secondNode, ..._restNodes] = node.children;
-			if (!isParagraph(firstNode)) return;
-			if (firstNode.children.length === 0) return;
+      node.data = {
+        ...node.data,
+        hName: config.customHTMLTags.enabled ? "card-grid" : "div",
+        hProperties: {
+          class: node.attributes?.class,
+        },
+      };
+    });
 
-			let cardImageOrLink: PhrasingContent;
-			let cardContent: PhrasingContent[];
-			let cardLabel = "";
+    visit(tree, isContainerDirective, (node) => {
+      if (node.name !== "card") return;
+      if (node.children.length === 0) return;
 
-			const imageWrapper: LeafDirective = {
-				type: "leafDirective",
-				name: "image-wrapper",
-				data: {
-					hName: "div",
-				},
-				children: [],
-			};
+      const [firstNode, secondNode, ..._restNodes] = node.children;
+      if (!isParagraph(firstNode)) return;
+      if (firstNode.children.length === 0) return;
 
-			const content: LeafDirective = {
-				type: "leafDirective",
-				name: "card-content",
-				data: {
-					hName: "div",
-				},
-				children: [],
-			};
+      let cardImageOrLink: PhrasingContent;
+      let cardContent: PhrasingContent[];
+      let cardLabel = "";
 
-			if (firstNode.data?.directiveLabel === true) {
-				if (!isText(firstNode.children[0])) return;
+      const imageWrapper: LeafDirective = {
+        type: "leafDirective",
+        name: "image-wrapper",
+        data: {
+          hName: "div",
+        },
+        children: [],
+      };
 
-				cardLabel = firstNode.children[0].value;
+      const content: LeafDirective = {
+        type: "leafDirective",
+        name: "card-content",
+        data: {
+          hName: "div",
+        },
+        children: [],
+      };
 
-				if (!isParagraph(secondNode)) return;
-				const [imageOrLink, ...restContent] = secondNode.children;
-				cardImageOrLink = imageOrLink;
-				cardContent = restContent;
-			} else {
-				const [imageOrLink, ...restContent] = firstNode.children;
-				cardImageOrLink = imageOrLink;
-				cardContent = restContent;
-			}
+      if (firstNode.data?.directiveLabel === true) {
+        if (!isText(firstNode.children[0])) return;
 
-			if (isImage(cardImageOrLink)) {
-				cardImageOrLink.alt = cardImageOrLink.alt || cardLabel;
-			} else if (isLink(cardImageOrLink)) {
-				const cardImage = cardImageOrLink.children[0];
-				if (!isImage(cardImage)) return;
+        cardLabel = firstNode.children[0].value;
 
-				cardImage.alt = cardImage.alt || cardLabel;
-			} else {
-				return;
-			}
+        if (!isParagraph(secondNode)) return;
+        const [imageOrLink, ...restContent] = secondNode.children;
+        cardImageOrLink = imageOrLink;
+        cardContent = restContent;
+      } else {
+        const [imageOrLink, ...restContent] = firstNode.children;
+        cardImageOrLink = imageOrLink;
+        cardContent = restContent;
+      }
 
-			imageWrapper.children.push(cardImageOrLink);
+      if (isImage(cardImageOrLink)) {
+        cardImageOrLink.alt = cardImageOrLink.alt || cardLabel;
+      } else if (isLink(cardImageOrLink)) {
+        const cardImage = cardImageOrLink.children[0];
+        if (!isImage(cardImage)) return;
 
-			for (const contentElem of cardContent) {
-				content.children.push(contentElem);
-			}
+        cardImage.alt = cardImage.alt || cardLabel;
+      } else {
+        return;
+      }
 
-			node.data = {
-				...node.data,
-				hProperties: {
-					class: node.attributes?.class,
-				},
-			};
-			node.children.splice(0, Number.POSITIVE_INFINITY, imageWrapper, content);
-		});
-	};
+      imageWrapper.children.push(cardImageOrLink);
+
+      for (const contentElem of cardContent) {
+        content.children.push(contentElem);
+      }
+
+      node.data = {
+        ...node.data,
+        hName: config.customHTMLTags.enabled ? "card" : "div",
+        hProperties: {
+          class: node.attributes?.class,
+        },
+      };
+      node.children.splice(0, Number.POSITIVE_INFINITY, imageWrapper, content);
+    });
+  };
 };
 
 export default remarkCard;
