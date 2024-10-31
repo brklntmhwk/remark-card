@@ -243,6 +243,10 @@ Some key takeaways are:
 - Both `card` and `card-grid` take common & custom HTML attributes
   - their styles are customizable by providing user-defined CSS class(es)
     - e.g., `border`, `background-color`, etc.
+- The default values of this plugin's options:
+  - `customHTMLTags.enabled`: `false`
+  - `imageContainerClass`: "image-container"
+  - `contentContainerClass`: "content-container"
 
 ## Feature(s) pending to be added
 
