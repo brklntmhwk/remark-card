@@ -6,7 +6,7 @@ import remarkDirective from "remark-directive";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import remarkCard from "../src";
+import remarkCard, { type Config, defaultConfig } from "../src/index.js";
 
 const normalizeHtml = (html: string) => {
 	return html.replace(/[\n\s]*(<)|>([\n\s]*)/g, (_match, p1, _p2) =>
@@ -14,32 +14,34 @@ const normalizeHtml = (html: string) => {
 	);
 };
 
-const parseMarkdown = mock(async (markdown: string, debug = false) => {
-	const remarkProcessor = unified()
-		.use(remarkParse)
-		.use(remarkDirective)
-		.use(remarkCard)
-		.use(remarkRehype)
-		.use(rehypeStringify);
+const parseMarkdown = mock(
+	async (markdown: string, options: Config = defaultConfig, debug = false) => {
+		const remarkProcessor = unified()
+			.use(remarkParse)
+			.use(remarkDirective)
+			.use(remarkCard, options)
+			.use(remarkRehype)
+			.use(rehypeStringify);
 
-	if (debug) {
-		const remarkOutput = await remarkProcessor.run(
-			remarkProcessor.parse(markdown),
-		);
-		console.log("Remark output:", JSON.stringify(remarkOutput, null, 2));
-	}
+		if (debug) {
+			const remarkOutput = await remarkProcessor.run(
+				remarkProcessor.parse(markdown),
+			);
+			console.log("Remark output:", JSON.stringify(remarkOutput, null, 2));
+		}
 
-	const output = String(await remarkProcessor.process(markdown));
+		const output = String(await remarkProcessor.process(markdown));
 
-	if (debug) {
-		console.log(
-			`HTML output:
+		if (debug) {
+			console.log(
+				`HTML output:
       ${normalizeHtml(output)}`,
-		);
-	}
+			);
+		}
 
-	return output;
-});
+		return output;
+	},
+);
 
 describe("Test the basic usage of card", () => {
 	test("Card with single-line text & image", async () => {
@@ -323,6 +325,29 @@ describe("Test the basic usage of card", () => {
 
 		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
 	});
+
+	test("Custom Tag Card with single-line text & image", async () => {
+		const input = `
+  :::card
+  ![image alt](https://xxxxx.xxx/yyy.jpg)
+  Single-line text
+  :::
+    `;
+		const output = `
+    <card>
+      <div>
+        <img src="https://xxxxx.xxx/yyy.jpg" alt="image alt">
+      </div>
+      <div>Single-line text</div>
+    </card>
+    `;
+
+		const html = await parseMarkdown(input, {
+			customHTMLTags: { enabled: true },
+		});
+
+		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
+	});
 });
 
 describe("Test the basic usage of card-grid", () => {
@@ -472,6 +497,53 @@ describe("Test the basic usage of card-grid", () => {
     `;
 
 		const html = await parseMarkdown(input);
+
+		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
+	});
+
+	test("Custom Tag Card grid & some cards", async () => {
+		const input = `
+  ::::card-grid
+  :::card{.card-1}
+  ![card 1](https://xxxxx.xxx/yyy.jpg)
+  Card 1
+  :::
+  :::card{.card-2}
+  ![card 2](https://xxxxx.xxx/yyy.jpg)
+  Card 2
+  :::
+  :::card{.card-3}
+  ![card 3](https://xxxxx.xxx/yyy.jpg)
+  Card 3
+  :::
+  ::::
+    `;
+		const output = `
+    <card-grid>
+      <card class="card-1">
+        <div>
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 1">
+        </div>
+        <div>Card 1</div>
+      </card>
+      <card class="card-2">
+        <div>
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 2">
+        </div>
+        <div>Card 2</div>
+      </card>
+      <card class="card-3">
+        <div>
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 3">
+        </div>
+        <div>Card 3</div>
+      </card>
+    </card-grid>
+    `;
+
+		const html = await parseMarkdown(input, {
+			customHTMLTags: { enabled: true },
+		});
 
 		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
 	});

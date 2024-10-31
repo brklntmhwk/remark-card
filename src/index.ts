@@ -18,7 +18,7 @@ export interface Config {
 	};
 }
 
-const defaultConfig: Config = {
+export const defaultConfig: Config = {
 	customHTMLTags: {
 		enabled: false,
 	},
