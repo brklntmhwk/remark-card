@@ -6,8 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.3.3 - 2024-10-31
 ### Changed
-
 - The import path to `utils.ts`
   - `./utils` ---> `./utils.js`
   - The TypeScript path format caused an "Cannot find module" error
