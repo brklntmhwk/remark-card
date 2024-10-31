@@ -186,25 +186,52 @@ If you want to use this in your [Astro](https://astro.build/) project, note that
 import { defineConfig } from 'astro/config';
 import remarkCard from "remark-card";
 import remarkDirective from "remark-directive";
-/* ... */
+// ...
 
 export default defineConfig({
-  /* ... */
+  // ...
   markdown: {
-    /* ... */
+    // ...
     remarkPlugins: [
-      /* ... */
+      // ...
       remarkDirective,
       remarkCard,
-      /* ... */
+      // ...
     ]
-    /* ... */
+    // ...
   }
-  /* ... */
+  // ...
 })
 ```
 
-Also, if you want to use your Astro component(s) for customization purposes, make sure to set the `customHTMLTags.enabled` to `true`.
+Also, if you want to use your Astro component(s) for customization purposes, make sure to set the `customHTMLTags.enabled` to `true` and assign your custom components like this:
+
+```ts
+import { Card, CardGrid } from '~/components/elements/Card';
+// ...
+
+export const mdxComponents = {
+  // ...
+  card: Card,
+  'card-grid': CardGrid,
+  // ...
+};
+```
+
+```astro
+---
+import { mdxComponents } from '~/lib/mdx-components';
+
+// ...
+
+const { page } = Astro.props;
+const { Content } = await page.render();
+---
+
+<Layout>
+  <Content components={mdxComponents}>
+</Layout>
+```
 
 ### How it works
 
@@ -219,11 +246,12 @@ Some key takeaways are:
 
 - Nested cards
   - It seems technically feasible but the use case of this might be rare
-- Customizable class names for image & content wrapper tags
+~~- Customizable class names for image & content containers~~
 
 ## TODO(s)
 
 - [ ] add a demo screenshot of the actual `card-grid` & `card` combination to this page
+- [x] add customizable class name options for image & content containers
 
 ## License
 
