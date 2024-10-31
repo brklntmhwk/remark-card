@@ -1,6 +1,6 @@
 {
   "name": "remark-card",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A remark plugin to parse card component(s)",
   "type": "module",
   "exports": "./dist/index.js",
