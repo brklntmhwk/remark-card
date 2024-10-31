@@ -6,13 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 0.5.0 - 2024-10-31
 ### Added
-
 - `imageContainerClass` & `contentContainerClass` options
 
 ## 0.4.0 - 2024-10-31
 ### Added
-
 - `customHTMLTags.enabled` option
 
 ## 0.3.3 - 2024-10-31
