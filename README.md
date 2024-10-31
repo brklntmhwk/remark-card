@@ -206,6 +206,7 @@ export default defineConfig({
 
 Also, if you want to use your Astro component(s) for customization purposes, make sure to set the `customHTMLTags.enabled` to `true` and assign your custom components like this:
 
+`~/lib/mdx-components.ts`
 ```ts
 import { Card, CardGrid } from '~/components/elements/Card';
 // ...
@@ -218,6 +219,7 @@ export const mdxComponents = {
 };
 ```
 
+`~/pages/page.astro`
 ```astro
 ---
 import { mdxComponents } from '~/lib/mdx-components';
