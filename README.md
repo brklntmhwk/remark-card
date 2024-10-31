@@ -95,6 +95,17 @@ Yields:
 </div>
 ```
 
+At the moment, it takes the following option(s):
+
+```ts
+export interface Config {
+  // Whether or not to use custom HTML tags for both `card` and `card-grid`. By default, it's set to `false`.
+  customHTMLTags: {
+    enabled: boolean
+  }
+}
+```
+
 For more possible patterns and in-depths explanations on the generic syntax(e.g., `:::something[...]{...}`), see `./test/index.test.ts` and [this page](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444/1), respectively.
 
 ### Syntax
@@ -166,6 +177,34 @@ Yields:
   </div>
 </div>
 ```
+
+### Astro
+
+If you want to use this in your [Astro](https://astro.build/) project, note that you need to install `remark-directive` and add it to the `astro.config.{js,mjs,ts}` file simultaneously.
+
+```ts title="astro.config.ts"
+import { defineConfig } from 'astro/config';
+import remarkCard from "remark-card";
+import remarkDirective from "remark-directive";
+/* ... */
+
+export default defineConfig({
+  /* ... */
+  markdown: {
+    /* ... */
+    remarkPlugins: [
+      /* ... */
+      remarkDirective,
+      remarkCard,
+      /* ... */
+    ]
+    /* ... */
+  }
+  /* ... */
+})
+```
+
+Also, if you want to use your Astro component(s) for customization purposes, make sure to set the `customHTMLTags.enabled` to `true`.
 
 ### How it works
 
