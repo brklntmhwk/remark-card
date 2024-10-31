@@ -4,13 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: "Release type (one of): major, minor, patch, prerelease"
+        description: "Release type (one of): major, minor, patch, premajor, preminor, prepatch, or prerelease"
         required: true
         type: choice
         options:
           - major
           - minor
           - patch
+          - premajor
+          - preminor
+          - prepatch
           - prerelease
 
 jobs:
@@ -49,14 +52,14 @@ jobs:
       - name: Install Dependencies
         run: bun install --no-save
 
-      - name: Set up Node.js env
+      - name: Setup Node.js Env
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Pre-Release Version Upgrade
-        if: github.event.inputs.release-type == 'prerelease'
+      - name: Bump Pre-Release Version
+        if: startsWith(github.event.inputs.release-type, 'pre')
         run: |
           {
             echo 'NEW_VERSION<<EOF'
@@ -67,8 +70,8 @@ jobs:
         env:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
-      - name: Release Version Upgrade
-        if: github.event.inputs.release-type != 'prerelease'
+      - name: Bump Release Version
+        if: startsWith(github.event.inputs.release-type, 'pre') != true
         run: |
           {
             echo 'NEW_VERSION<<EOF'
@@ -79,37 +82,37 @@ jobs:
         env:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
-      - name: Changelog Update
+      - name: Update Changelog
         uses: superfaceai/release-changelog-action@v3
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
           operation: release
 
-      - name: Git User Configuration
+      - name: Configure Git User's Info
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Git Commit for Preceding Changes (package.json & CHANGELOG.md) and Tag Creation
+      - name: Git Commit Preceding Changes (package.json & CHANGELOG.md) and Create Git Tag
         run: |
           git add "package.json"
           git add "CHANGELOG.md"
           git commit -m "chore: 🤖 release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
-      - name: Package Release
+      - name: Publish Package
         run: npm publish --provenance --access public --tag ${{ env.RELEASE_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Git Push to Repository
+      - name: Git Push Changes to Repository
         run: |
           git push origin && git push --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Getting Changelog for Upcoming Version
+      - name: Get Changelog for Upcoming Version
         id: get-changelog
         uses: superfaceai/release-changelog-action@v3
         with:
@@ -117,7 +120,7 @@ jobs:
           version: ${{ env.NEW_VERSION }}
           operation: read
 
-      - name: Release Doc Update
+      - name: Update Github Release Documentation
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.NEW_VERSION }}
