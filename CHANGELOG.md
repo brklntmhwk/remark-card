@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- The options fixed to be optional as expected
+
 ## 0.5.0 - 2024-10-31
 ### Added
 - `imageContainerClass` & `contentContainerClass` options
