@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- The release workflow of Github Actions
+  - In the previous version, the build process were not included and therefore no build artifacts were generated or published either
+
 ## 0.3.1 - 2024-10-31
 ### Changed
 - The release workflow of Github Actions
