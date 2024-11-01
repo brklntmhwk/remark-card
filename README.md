@@ -259,6 +259,8 @@ Some key takeaways are:
   - `customHTMLTags.enabled`: `false`
   - `imageContainerClass`: "image-container"
   - `contentContainerClass`: "content-container"
+  - `cardGridClass`: `undefined`
+  - `cardClass`: `undefined`
 
 ## Feature(s) pending to be added
 
