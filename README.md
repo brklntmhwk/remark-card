@@ -112,8 +112,8 @@ export type Config = {
 }
 ```
 
-> [!QUESTION]
-> **Why do we need those card & card grid class options?**
+> [!NOTE]
+> Why do we need those card & card grid class options?
 > \- Since [MDX 2](https://mdxjs.com/blog/v2/), the compiler has come to throw an error "Could not parse expression with acorn: $error" whenever there are unescaped curly braces and the expression inside them is invalid. This breaking change leads the directive syntax (`:::xxx{a=b}`) to cause the error, so the options are like an escape hatch for that situation.
 
 For more possible patterns and in-depths explanations on the generic syntax(e.g., `:::something[...]{...}`), see `./test/index.test.ts` and [this page](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444/1), respectively.
