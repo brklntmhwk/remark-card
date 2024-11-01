@@ -23,25 +23,25 @@ To install the plugin:
 With `npm`:
 
 ```bash
-npm install remark-card --save-dev
+npm install remark-card
 ```
 
 With `yarn`:
 
 ```bash
-yarn add --dev remark-card
+yarn add remark-card
 ```
 
 With `pnpm`:
 
 ```bash
-pnpm add -D remark-card
+pnpm add remark-card
 ```
 
 With `bun`:
 
 ```bash
-bun install -D remark-card
+bun install remark-card
 ```
 
 ### Usage
@@ -90,21 +90,31 @@ Yields:
 
 ```html
 <div>
-  <div><img src="https://xxxxx.xxx/yyy.jpg" alt="image alt" /></div>
-  <div>Card content</div>
+  <div class="image-container">
+    <img src="https://xxxxx.xxx/yyy.jpg" alt="image alt" />
+  </div>
+  <div class="content-container">Card content</div>
 </div>
 ```
 
 At the moment, it takes the following option(s):
 
 ```ts
-export interface Config {
+export type Config = {
   // Whether or not to use custom HTML tags for both `card` and `card-grid`. By default, it's set to `false`.
-  customHTMLTags: {
-    enabled: boolean
-  }
+  customHTMLTags?: {
+    enabled: boolean;
+  };
+  cardGridClass?: string;
+  cardClass?: string;
+  imageContainerClass?: string;
+  contentContainerClass?: string;
 }
 ```
+
+> [!QUESTION]
+> **Why do we need those card & card grid class options?**
+> \- Since [MDX 2](https://mdxjs.com/blog/v2/), the compiler has come to throw an error "Could not parse expression with acorn: $error" whenever there are unescaped curly braces and the expression inside them is invalid. This breaking change leads the directive syntax (`:::xxx{a=b}`) to cause the error, so the options are like an escape hatch for that situation.
 
 For more possible patterns and in-depths explanations on the generic syntax(e.g., `:::something[...]{...}`), see `./test/index.test.ts` and [this page](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444/1), respectively.
 
@@ -125,8 +135,10 @@ Yields:
 
 ```html
 <div id="card-id" class="card">
-  <div><img src="https://xxxxx.xxx/yyy.jpg" alt="image alt" /></div>
-  <div>Card content</div>
+  <div class="image-container">
+    <img src="https://xxxxx.xxx/yyy.jpg" alt="image alt" />
+  </div>
+  <div class="content-container">Card content</div>
 </div>
 ```
 
@@ -158,22 +170,22 @@ Yields:
 ```html
 <div class="card-grid">
   <div class="card-1">
-    <div>
+    <div class="image-container">
       <img src="https://xxxxx.xxx/yyy.jpg" alt="card 1">
     </div>
-    <div>Card 1</div>
+    <div class="content-container">Card 1</div>
   </div>
   <div class="card-2">
-    <div>
+    <div class="image-container">
       <img src="https://xxxxx.xxx/yyy.jpg" alt="card 2">
     </div>
-    <div>Card 2</div>
+    <div class="content-container">Card 2</div>
   </div>
   <div class="card-3">
-    <div>
+    <div class="image-container">
       <img src="https://xxxxx.xxx/yyy.jpg" alt="card 3">
     </div>
-    <div>Card 3</div>
+    <div class="content-container">Card 3</div>
   </div>
 </div>
 ```
