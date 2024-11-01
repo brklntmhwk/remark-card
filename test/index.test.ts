@@ -351,7 +351,7 @@ describe("Test the basic usage of card", () => {
 		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
 	});
 
-	test("Card with with its custom class names and single-line text & image", async () => {
+	test("Card with image & content containers' custom class names and single-line text & image", async () => {
 		const input = `
   :::card
   ![image alt](https://xxxxx.xxx/yyy.jpg)
@@ -370,6 +370,29 @@ describe("Test the basic usage of card", () => {
 		const html = await parseMarkdown(input, {
 			imageContainerClass: "image-custom-container",
 			contentContainerClass: "content-custom-container",
+		});
+
+		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
+	});
+
+	test("Card with its custom class name defined via the plugin options and single-line text & image", async () => {
+		const input = `
+  :::card
+  ![image alt](https://xxxxx.xxx/yyy.jpg)
+  Single-line text
+  :::
+    `;
+		const output = `
+    <div class="card">
+      <div class="image-container">
+        <img src="https://xxxxx.xxx/yyy.jpg" alt="image alt">
+      </div>
+      <div class="content-container">Single-line text</div>
+    </div>
+    `;
+
+		const html = await parseMarkdown(input, {
+			cardClass: "card",
 		});
 
 		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
@@ -569,6 +592,53 @@ describe("Test the basic usage of card-grid", () => {
 
 		const html = await parseMarkdown(input, {
 			customHTMLTags: { enabled: true },
+		});
+
+		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
+	});
+
+	test("Card grid with its custom class name defined via the plugin options & some cards", async () => {
+		const input = `
+  ::::card-grid
+  :::card{.card-1}
+  ![card 1](https://xxxxx.xxx/yyy.jpg)
+  Card 1
+  :::
+  :::card{.card-2}
+  ![card 2](https://xxxxx.xxx/yyy.jpg)
+  Card 2
+  :::
+  :::card{.card-3}
+  ![card 3](https://xxxxx.xxx/yyy.jpg)
+  Card 3
+  :::
+  ::::
+    `;
+		const output = `
+    <div class="card-grid">
+      <div class="card-1">
+        <div class="image-container">
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 1">
+        </div>
+        <div class="content-container">Card 1</div>
+      </div>
+      <div class="card-2">
+        <div class="image-container">
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 2">
+        </div>
+        <div class="content-container">Card 2</div>
+      </div>
+      <div class="card-3">
+        <div class="image-container">
+          <img src="https://xxxxx.xxx/yyy.jpg" alt="card 3">
+        </div>
+        <div class="content-container">Card 3</div>
+      </div>
+    </div>
+    `;
+
+		const html = await parseMarkdown(input, {
+			cardGridClass: "card-grid",
 		});
 
 		expect(normalizeHtml(html)).toBe(normalizeHtml(output));
